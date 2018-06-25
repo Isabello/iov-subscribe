@@ -1,0 +1,90 @@
+html
+  head
+    link(rel='stylesheet', href='https://cdnjs.cloudflare.com/ajax/libs/bulma/0.7.1/css/bulma.css')
+    link(rel='stylesheet', href='css/main.css')
+    script(src='https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.0.3/socket.io.js')
+    script(src='https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js')
+  body
+    #chat-app
+      #chat.has-text-centered
+        section.hero.is-success
+          .hero-body
+            .container
+              h1.title IOV Subscription Tester
+              h2 Try subscribing to your address!
+        section.section.transaction-history
+          .container
+            .columns
+              .box.column.is-8.is-offset-2
+                h2.title Subscribe to an Address
+                .chat-messages.has-text-left
+                  ul#transaction-history-list
+                form(name='transaction-history')
+                  .field.has-addons
+                    p.control
+                      input(type='text', class='input', value='', id='subscribed-address', 'disabled')
+                    p.control.is-expanded
+                      input(type='text', class='input', placeholder='feee6d59af591956e2b5c4a9e2eb3afe2a1b55f1', id='address')
+                    p.control
+                      input(type='submit', class='button is-success', value='Post')
+        section.section.current-blocks
+          .container
+            .columns
+              .box.column.is-8.is-offset-2
+                h2.title Current Blocks
+                .chat-messages.has-text-left
+                  ul#current-blocks-list
+
+        footer
+          .container
+            .content
+              p
+                | Powered by Weave-JS and RethinkDb
+    script.
+      const socket = io();
+      var blockUpdate = document.getElementById('getBlock');
+
+
+      // Gets block from db
+      $('form[name="block-query"]').submit(function() {
+        const block = $('#block').val();
+        socket.emit('request:blockHistory', {height: block});
+        $('#message').val('');
+        return false;
+      });
+
+      // Response from DB if block found
+      socket.on('response:blockHistory', function(message) {
+        $('#block-query-list').append($('<li>').text('Block Height Found: ' + message.block.header.height));
+      });
+
+      //Gets transaction history by address
+      $('form[name="transaction-history"]').submit(function() {
+        const address = $('#address').val();
+        $('#address').prop('disabled', true);
+        $('#subscribed-address').val(address); // Sets address as subscribed
+        socket.emit('request:TransactionHistory', {address: address});
+        $('#message').val('');
+        $('#transaction-history-list').empty();
+        return false;
+      });
+
+      // Response from DB if history found
+      socket.on('response:TransactionHistory', function(message) {
+        $('#transaction-history-list').append($('<li>').text('Height: ' + message.height));
+        $('#transaction-history-list').append($('<li>').text(message.parsed.sendMsg.src));
+      });
+
+      // Push updates from subscriptions
+      socket.on('push:transaction', function(message) {
+        $('#transaction-history-list').prepend($('<li>').text(message.parsed.sendMsg.src));
+        $('#transaction-history-list').prepend($('<li>').text('Height: ' + message.height));
+
+      });
+
+      socket.on('push:header', function (message) {
+        if ( $('#current-blocks-list').children().length >= 10) {
+          $('#current-blocks-list').children().first().remove();
+        }
+          $('#current-blocks-list').append($('<li>').text('Block Height Received: ' + message));
+      });
