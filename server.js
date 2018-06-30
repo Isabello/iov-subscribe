@@ -1,11 +1,9 @@
 var app = require('express')();
 var path = require('path');
-//module.exports = app = express();
-var http = require('http').Server(app);
-var io = require('socket.io')(http);
+var server = require('http').Server(app);
+var io = require('socket.io')(server);
 var db = require('./db/config');
 var weave = require('weave/lib/weave.node.js');
-var protobuf = require('protobufjs');
 
 let bovJSON = require('./bov/bov.json');
 
@@ -15,7 +13,7 @@ let bov = weave.loadJSON(bovJSON);
 db.setup(register);
 
 // Connects to a Tendermint Instance
-var client = new weave.Client('ws://192.168.56.101:46657');
+const client = new weave.Client('wss://bov.unicornnet.iov.one');
 
 /// Helpers
 // Pretty Console Logging, if needed
@@ -69,7 +67,7 @@ io.on('connection', function (socket) {
   // response:TransactionHistory
   socket.on('request:TransactionHistory', function (data) {
      console.log("Socket---->request:history %s", JSON.stringify(data, null, 2));
-     db.getTransactionHistory({address: data.address}, function (err, result) {
+     db.getTransactionHistory(data.address, function (err, result) {
        if (err) {
          console.log("Error getting data:  %s", err);
          return;
@@ -105,6 +103,6 @@ function register() {
 }
 
 //the last step:  listen for requests
-http.listen(3000, function () {
+server.listen(3000, function () {
   console.log('listening on *:3000');
 });
