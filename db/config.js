@@ -1,26 +1,28 @@
-var r = require('rethinkdb');
-var dbHost = '192.168.56.101' // Use me instead....
+const r = require('rethinkdb');
+
+const connection = {host: '192.168.56.101', port: 28015};
+const dbConfig = {blocks: {database: 'blocks', tableName: 'headers'},
+                        transactions: {database: 'transactions', tableName: 'transactions'}};
 /**
  * Setup the RethinkDB environment.
  *  --create the realtime database if it doesn't exist
  *  --create the messages and users tables if they don't exist
  */
 module.exports.setup = function (callback) {
-  r.connect({host: '192.168.56.101', port: 28015}, function (err, connection) {
+  onConnect(function (err, connection) {
     //if (err) throw err;
-    var db_name = 'blocks';
-    r.dbCreate(db_name).run(connection, function (err, result) {
+    r.dbCreate(dbConfig.blocks.database).run(connection, function (err, result) {
       if (err) {
-        console.log("---->Database '%s' already exists (%s:%s)\n%s", db_name, err.name, err.msg, err.message);
+        console.log("---->Database '%s' already exists (%s:%s)\n%s", dbConfig.blocks.database, err.name, err.msg, err.message);
       }
       else {
-        console.log("---->Database '%s' created", db_name);
+        console.log("---->Database '%s' created", dbConfig.blocks.database);
       }
 
       //create block headers table
-      r.db(db_name).tableCreate('headers').run(connection, function (err, result) {
+      r.db(dbConfig.blocks.database).tableCreate(dbConfig.blocks.tableName).run(connection, function (err, result) {
         if (err) {
-          console.log("---->Table 'header' already exists (%s:%s)\n%s", err.name, err.msg, err.message);
+          console.log("---->Table '%s' already exists (%s:%s)\n%s", dbConfig.blocks.tableName, err.name, err.msg, err.message);
         }
         else {
           console.log(JSON.stringify(result, null, 2));
@@ -28,19 +30,19 @@ module.exports.setup = function (callback) {
       });
     });
 
-    db_name = 'transactions';
-    r.dbCreate(db_name).run(connection, function (err, result) {
+    r.dbCreate(dbConfig.transactions.database).run(connection, function (err, result) {
       if (err) {
-        console.log("---->Database '%s' already exists (%s:%s)\n%s", db_name, err.name, err.msg, err.message);
+        console.log("---->Database '%s' already exists (%s:%s)\n%s", dbConfig.transactions.database, err.name, err.msg, err.message);
       }
       else {
-        console.log("---->Database '%s' created", db_name);
+        console.log("---->Database '%s' created", dbConfig.transactions.database);
       }
 
       //create transactions table
-      r.db(db_name).tableCreate('transactions').run(connection, function (err, result) {
+      r.db(dbConfig.transactions.database).tableCreate(dbConfig.transactions.tableName)
+      .run(connection, function (err, result) {
         if (err) {
-          console.log("---->Table 'transactions' already exists (%s:%s)\n%s", err.name, err.msg, err.message);
+          console.log("---->Table '%s' already exists (%s:%s)\n%s", dbConfig.transactions.tableName, err.name, err.msg, err.message);
         }
         else {
           console.log(JSON.stringify(result, null, 2));
@@ -58,7 +60,7 @@ module.exports.setup = function (callback) {
  */
 module.exports.getBlocks = function (data, callback) {
   console.log("DB---->getBlocks %s", data.height);
-  r.connect({host: '192.168.56.101', port: 28015}, function (err, connection) {
+  r.connect(connection, function (err, connection) {
     if (err) throw err;
 
     r.db('blocks').table('headers').filter(
@@ -77,13 +79,13 @@ module.exports.getBlocks = function (data, callback) {
 
 module.exports.getTransactionHistory = function (data, callback) {
   console.log("DB---->getTransactions %s", data.address);
-  r.connect({host: '192.168.56.101', port: 28015}, function (err, connection) {
+  onConnect(function (err, connection) {
     if (err) throw err;
 
     r.db('transactions').table('transactions').orderBy(r.desc(r.row('TxResult')('height'))).run(connection, function (err, cursor) {
       if (err) throw err;
     	cursor.each(function (err, row) {
-      	//console.log("Row Result: " + JSON.stringify(row.parsed, null, 2));
+      	console.log("Row Result: " + JSON.stringify(row.parsed.TxResult, null, 2));
         connection.close();
       	callback(null, row);
     	})
@@ -95,8 +97,7 @@ module.exports.getTransactionHistory = function (data, callback) {
  * Write block header to db
  */
 module.exports.saveHeader = function (header, callback) {
-  var connection = null;
-  r.connect({host: '192.168.56.101', port: 28015}, function (err, connection) {
+  onConnect(function (err, connection) {
     if (err) throw err;
     r.db('blocks').table('headers').insert(header).run(connection, function (err, result) {
       if (err) {
@@ -114,8 +115,7 @@ module.exports.saveHeader = function (header, callback) {
  * Write transaction to db
  */
 module.exports.saveTransaction = function (transaction, callback) {
-  var connection = null;
-  r.connect({host: '192.168.56.101', port: 28015}, function (err, connection) {
+  onConnect(function (err, connection) {
     if (err) throw err;
     r.db('transactions').table('transactions').insert(transaction).run(connection, function (err, result) {
       if (err) {
@@ -135,7 +135,7 @@ module.exports.saveTransaction = function (transaction, callback) {
  */
 module.exports.registerRealtimeBlockFeed = function (callback) {
   console.log("DB---->registerRealtimeBlockFeed");
-  r.connect({host: '192.168.56.101', port: 28015}, function (err, connection) {
+  onConnect(function (err, connection) {
     if (err) throw err;
     r.db('blocks').table('headers').changes().run(connection, function (err, cursor) {
       if (err) throw err;
@@ -153,7 +153,7 @@ module.exports.registerRealtimeBlockFeed = function (callback) {
  */
 module.exports.registerRealtimeTransactionFeed = function (callback) {
   console.log("DB---->registerRealtimeTransactionFeed");
-  r.connect({host: '192.168.56.101', port: 28015}, function (err, connection) {
+  onConnect(function (err, connection) {
     if (err) throw err;
     r.db('transactions').table('transactions').changes().run(connection, function (err, cursor) {
       if (err) throw err;
@@ -165,3 +165,12 @@ module.exports.registerRealtimeTransactionFeed = function (callback) {
     });
   });
 };
+
+function onConnect(callback) {
+  r.connect(connection, function(err, connection) {
+    if (err) throw err;
+    connection['_id'] = Math.floor(Math.random()*10001);
+    callback(err, connection);
+  });
+}
+
