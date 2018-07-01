@@ -70,25 +70,31 @@ module.exports.getBlocks = function (data, callback) {
 
     	cursor.next(function (err, row) {
       	console.log("Row Result: " + JSON.stringify(row.block.header.height, null, 2));
-        connection.close();
+
       	callback(null, row);
-    	})
+      })
+      connection.close();
     });
   });
 };
 
 module.exports.getTransactionHistory = function (data, callback) {
-  console.log("DB---->getTransactions %s", data.address);
+  console.log("DB---->getTransactions %s", data);
+
   onConnect(function (err, connection) {
     if (err) throw err;
 
-    r.db('transactions').table('transactions').orderBy(r.desc(r.row('TxResult')('height'))).run(connection, function (err, cursor) {
+    r.db('transactions').table('transactions')
+      .filter(
+        {'parsed': {'sendMsg':{ 'src': data}}})
+      .orderBy(r.desc('height')).run(connection, function (err, cursor) {
       if (err) throw err;
     	cursor.each(function (err, row) {
-      	console.log("Row Result: " + JSON.stringify(row.parsed.TxResult, null, 2));
-        connection.close();
+      	console.log("Row Result: " + JSON.stringify(row.parsed, null, 2));
+
       	callback(null, row);
-    	})
+      })
+      connection.close();
     });
   });
 };
@@ -123,7 +129,7 @@ module.exports.saveTransaction = function (transaction, callback) {
         callback(err);
       }
 
-      //console.log("DB---->saveTransaction %s", result);
+      console.log("DB---->saveTransaction %s", result);
       connection.close()
     });
   })
@@ -142,7 +148,7 @@ module.exports.registerRealtimeBlockFeed = function (callback) {
       cursor.each(function (err, row) {
         if (err) throw err;
         console.log("DB---->registerRealtimeBlockFeed pushing....");
-        callback(row);
+        callback(row.new_val.block.header.height);
       });
     });
   });
@@ -160,7 +166,7 @@ module.exports.registerRealtimeTransactionFeed = function (callback) {
       cursor.each(function (err, row) {
         if (err) throw err;
         console.log("DB---->registerRealtimeTransactionFeed pushing....");
-        callback(row);
+        callback(row.new_val);
       });
     });
   });
@@ -173,4 +179,3 @@ function onConnect(callback) {
     callback(err, connection);
   });
 }
-
