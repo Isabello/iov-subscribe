@@ -28,6 +28,17 @@ html
               .box.column.is-6
                 h2.title History
                 ul#transaction-history-list
+            .rows
+              .box.row.is-6
+                h2.title Feed me a block height
+                .block-query.has-text-left
+                  ul#block-query
+                form(name='block-query')
+                  .field.has-addons
+                    p.control.is-expanded
+                      input(type='text', class='input', placeholder='Get a Block, try 400!', id='block')
+                    p.control
+                      input(type='submit', class='button is-success', value='Post')
         footer
           .container
             .content
@@ -48,7 +59,7 @@ html
 
       // Response from DB if block found
       socket.on('response:blockHistory', function(message) {
-        $('#block-query-list').append($('<li>').text('Block Height Found: ' + message.block.header.height));
+        $('#block-query').html('Block Height Found: ' + JSON.stringify(message.block.header));
       });
 
       //Gets transaction history by address
