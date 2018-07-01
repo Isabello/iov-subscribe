@@ -8,19 +8,10 @@ form {
     padding: 100px;
 }
 
-div
-{
-  border: 1px solid red;
-}
-
 block-query-list
 {
   float: left;
   width: 64%;
 }
 
-section.section.transaction-history
-{
-  float: right;
-  width: 35%;
-}
+
