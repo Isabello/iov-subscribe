@@ -2,11 +2,21 @@
   "name": "realtime",
   "version": "0.0.1",
   "private": true,
+  "scripts": {
+    "test": "mocha",
+    "eslint": "mocha ./test/eslint.js",
+    "eslint-fix": "/node_modules/.bin/eslint --fix"
+  },
   "dependencies": {
     "express": "^4.10.2",
     "pug": "^2.0.3",
     "rethinkdb": "^2.3.3",
     "socket.io": "^2.0.0",
     "weave": "github:isabello/weave-js#parseSubscribedTx"
+  },
+  "devDependencies": {
+    "eslint": "^5.0.1",
+    "mocha": "^5.2.0",
+    "mocha-eslint": "^4.1.0"
   }
 }
