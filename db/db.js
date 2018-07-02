@@ -5,15 +5,15 @@ const {setup} = require('./setup');
 
 
 class db  {
-    constructor() {
-        this.registerRealtimeBlockFeed = registerRealtimeBlockFeed;
-        this.registerRealtimeTransactionFeed = registerRealtimeTransactionFeed;
-        this.getBlocks = getBlocks;
-        this.getTransactionHistory = getTransactionHistory;
-        this.saveHeader = saveHeader;
-        this.saveTransaction = saveTransaction;
-        this.setup = setup;
-    }
+	constructor() {
+		this.registerRealtimeBlockFeed = registerRealtimeBlockFeed;
+		this.registerRealtimeTransactionFeed = registerRealtimeTransactionFeed;
+		this.getBlocks = getBlocks;
+		this.getTransactionHistory = getTransactionHistory;
+		this.saveHeader = saveHeader;
+		this.saveTransaction = saveTransaction;
+		this.setup = setup;
+	}
 }
 
 module.exports = db;
