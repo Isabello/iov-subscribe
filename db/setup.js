@@ -58,7 +58,7 @@ module.exports.teardown = function () {
 		//if (err) throw err;
 		r.dbDrop(dbConfig.blocks.database).run(connection, function (err) {
 			if (err) {
-				console.log('---->Database \'%s\' already exists (%s:%s)\n%s', dbConfig.blocks.database, err.name, err.msg, err.message);
+				console.log('---->Database \'%s\' does not exist (%s:%s)\n%s', dbConfig.blocks.database, err.name, err.msg, err.message);
 			}
 			else {
 				console.log('---->Database \'%s\' dropped', dbConfig.blocks.database);
@@ -71,7 +71,7 @@ module.exports.teardown = function () {
 	onConnect(function (err, connection) { 
 		r.dbDrop(dbConfig.transactions.database).run(connection, function (err) {
 			if (err) {
-				console.log('---->Database \'%s\' already exists (%s:%s)\n%s', dbConfig.transactions.database, err.name, err.msg, err.message);
+				console.log('---->Database \'%s\' does not exist (%s:%s)\n%s', dbConfig.transactions.database, err.name, err.msg, err.message);
 			}
 			else {
 				console.log('---->Database \'%s\' dropped', dbConfig.transactions.database);
