@@ -1,6 +1,7 @@
 const r = require('rethinkdb');
 
 const connection = {host: '192.168.56.101', port: 28015};
+
 const dbConfig = {
 	blocks: {database: 'blocks', tableName: 'headers'},
 	transactions: {database: 'transactions', tableName: 'transactions'}

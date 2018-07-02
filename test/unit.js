@@ -2,5 +2,6 @@
  * Unit Tests
  *******************************************************/
 
-// DB Unit
+// DB 
 require('../db/test/unit/db.js');
+require('../db/test/unit/config.js');
