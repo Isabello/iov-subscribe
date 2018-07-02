@@ -23,9 +23,12 @@ module.exports.setup = function (callback) {
 				else {
 					console.log(JSON.stringify(result, null, 2));
 				}
+				connection.close(); // Prevents Connection Leakage
 			});
-		});
-  
+		}); 		
+	});
+
+	onConnect(function (err, connection) {
 		r.dbCreate(dbConfig.transactions.database).run(connection, function (err) {
 			if (err) {
 				console.log('---->Database \'%s\' already exists (%s:%s)\n%s', dbConfig.transactions.database, err.name, err.msg, err.message);
@@ -33,8 +36,8 @@ module.exports.setup = function (callback) {
 			else {
 				console.log('---->Database \'%s\' created', dbConfig.transactions.database);
 			}
-  
-			//create transactions table
+
+			// //create transactions table
 			r.db(dbConfig.transactions.database).tableCreate(dbConfig.transactions.tableName)
 				.run(connection, function (err, result) {
 					if (err) {
@@ -43,11 +46,38 @@ module.exports.setup = function (callback) {
 					else {
 						console.log(JSON.stringify(result, null, 2));
 					}
-				});
+					connection.close(); // Prevents Connection Leakage
+				});            
+		});        
+	});
+	callback();
+};
+  
+module.exports.teardown = function () {
+	onConnect(function (err, connection) {
+		//if (err) throw err;
+		r.dbDrop(dbConfig.blocks.database).run(connection, function (err) {
+			if (err) {
+				console.log('---->Database \'%s\' already exists (%s:%s)\n%s', dbConfig.blocks.database, err.name, err.msg, err.message);
+			}
+			else {
+				console.log('---->Database \'%s\' dropped', dbConfig.blocks.database);
+			}
+			connection.close(); // Prevents Connection Leakage
 		});
   
-		connection.close(); // Prevents Connection Leakage
-		callback();
+		
+	});
+	onConnect(function (err, connection) { 
+		r.dbDrop(dbConfig.transactions.database).run(connection, function (err) {
+			if (err) {
+				console.log('---->Database \'%s\' already exists (%s:%s)\n%s', dbConfig.transactions.database, err.name, err.msg, err.message);
+			}
+			else {
+				console.log('---->Database \'%s\' dropped', dbConfig.transactions.database);
+			}
+			connection.close(); // Prevents Connection Leakage		
+		});		
 	});
 };
   
