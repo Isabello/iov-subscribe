@@ -1,0 +1,24 @@
+os:
+  - linux
+
+language: node_js
+node_js:
+  - "8"
+  - "10"
+
+before_install:
+  - chmod +x travis.sh
+
+install:
+- npm install
+
+script:
+- ./travis.sh
+
+# whitelist long living branches to avoid testing feature branches twice (as branch and as pull request)
+branches:
+  only:
+  - master
+
+notifications:
+  email: false
