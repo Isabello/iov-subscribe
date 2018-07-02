@@ -1,5 +1,8 @@
-var db = require('../db/config');
+var DB = require('../db/db.js');
 const { io } = require("../server");
+
+
+const db = new DB();
 
 // Registers changefeeds from RethinkDB
 function register() {

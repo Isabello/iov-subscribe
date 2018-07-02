@@ -1,5 +1,8 @@
-var db = require('../db/config');
+var DB = require('../db/db.js');
 const { client, bov } = require("../server");
+const { io } = require("../server");
+
+const db = new DB();
 
 function saveBlock(o) {
   parseTxFromBlock(o);
