@@ -28,10 +28,6 @@ db.setup(register);
 // Subscribe to block headers
 client.subscribeHeaders(saveBlock);
 
-/// Helpers
-// Pretty Console Logging, if needed
-//pprint = o => console.log(JSON.stringify(o, null, 2));
-
 // If we only want to subscribe to TX, uncomment below
 //parseTx = o => client.parseSubscribedTx(o.TxResult,bov.app.Tx).then(saveTransaction);
 // client.subscribeAllTx(parseTx);

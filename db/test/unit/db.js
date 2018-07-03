@@ -22,32 +22,32 @@ describe('DB', () => {
             
 				it('registerRealtimeTransactionFeed', () => {
           
-					return expect(db.registerRealtimeBlockFeed).to.be.a('function');
+					return expect(db.registerRealtimeTransactionFeed).to.be.a('function');
 				});
             
 				it('getBlocks', () => {
           
-					return expect(db.registerRealtimeBlockFeed).to.be.a('function');
+					return expect(db.getBlocks).to.be.a('function');
 				});
             
 				it('getTransactionHistory', () => {
           
-					return expect(db.registerRealtimeBlockFeed).to.be.a('function');
+					return expect(db.getTransactionHistory).to.be.a('function');
 				});
             
 				it('saveHeader', () => {
           
-					return expect(db.registerRealtimeBlockFeed).to.be.a('function');
+					return expect(db.saveHeader).to.be.a('function');
 				});
             
 				it('saveTransaction', () => {
           
-					return expect(db.registerRealtimeBlockFeed).to.be.a('function');
+					return expect(db.saveTransaction).to.be.a('function');
 				});
             
 				it('setup', () => {
           
-					return expect(db.registerRealtimeBlockFeed).to.be.a('function');
+					return expect(db.setup).to.be.a('function');
 				});
 			});
 		});      
