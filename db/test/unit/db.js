@@ -48,6 +48,11 @@ describe('DB', () => {
 				it('setup', () => {
           
 					return expect(db.setup).to.be.a('function');
+                });
+
+                it('teardown', () => {
+          
+					return expect(db.teardown).to.be.a('function');
 				});
 			});
 		});      

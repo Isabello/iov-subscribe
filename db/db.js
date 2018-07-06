@@ -1,7 +1,7 @@
-const {registerRealtimeBlockFeed, registerRealtimeTransactionFeed} = require('./changefeed');
-const {getBlocks, getTransactionHistory} = require('./read');
-const {saveHeader, saveTransaction} = require('./write');
-const {setup} = require('./setup');
+    const {registerRealtimeBlockFeed, registerRealtimeTransactionFeed} = require('./changefeed');
+    const {getBlocks, getTransactionHistory} = require('./read');
+    const {saveHeader, saveTransaction} = require('./write');
+    const {setup, teardown} = require('./setup');
 
 
 class db  {
@@ -12,7 +12,8 @@ class db  {
 		this.getTransactionHistory = getTransactionHistory;
 		this.saveHeader = saveHeader;
 		this.saveTransaction = saveTransaction;
-		this.setup = setup;
+        this.setup = setup;
+        this.teardown = teardown;
 	}
 }
 

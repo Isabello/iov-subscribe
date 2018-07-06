@@ -6,6 +6,7 @@
     "test": "mocha",
     "eslint": "mocha ./test/eslint.js",
     "eslint-fix": "./node_modules/.bin/eslint --fix",
+    "test-functional": "mocha test/functional.js",
     "test-unit": "mocha test/unit.js"
   },
   "dependencies": {
